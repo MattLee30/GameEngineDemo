@@ -16,8 +16,8 @@ void updateBall(Circle* ball, float deltaTime, float gravity) {
     ball->x += ball->vx * deltaTime;
     ball->y += ball->vy * deltaTime;
 
-    float screenWidth = 1600.0f;
-    float screenHeight = 1000.0f;
+    float screenWidth = 800.0f;
+    float screenHeight = 600.0f;
 
     // Check collision with left and right boundaries
     if (ball->x - ball->radius < 0.0f) {
