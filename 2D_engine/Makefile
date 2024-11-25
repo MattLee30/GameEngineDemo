@@ -1,4 +1,4 @@
-APP_NAME = myApp
+APP_NAME = myApps
 BUILD_DIR = ./build
 SRC_DIR = ./src/
 C_FILES = $(wildcard $(SRC_DIR)*.c)

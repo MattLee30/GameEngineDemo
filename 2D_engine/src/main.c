@@ -1,283 +1,270 @@
 #include <GLFW/glfw3.h>
+#include "window.h"
+#include "framebuffer.h"
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <stdbool.h>
+#include "structs.h"
+#include "circle.h"
+#include "square.h"
+#include "drawShape.h"
 
-#define PI 3.14159265358979323846
+
 #define GRAVITY -5.8f  
 #define BOUNCE_DAMPING 0.8f 
 
-typedef struct {
-    float x, y;       
-    float radius;   
-    float velocityX;
-    float velocityY; 
-} Circle;
+GameObject* gameObjects = NULL;  // Array of GameObjects
+int gameObjectCount = 0;
 
-Circle* balls = NULL;   
-int ballCount = 0;     
-bool dragging = false; 
-Circle previewBall;      
+Circle* balls = NULL;
+int ballCount = 0;
 
+bool dragging = false;           
+bool isDraggingObject = false;   
+int selectedObjectIndex = -1;    
+
+GameObject previewObject;        // Preview object for creation
 double dragStartX, dragStartY;
 double dragStartTime;
 
-// Function to draw a circle
-void drawCircle(float x, float y, float radius, int segments) {
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < segments; i++) {
-        float theta = 2.0f * PI * i / segments;
-        float dx = radius * cosf(theta);
-        float dy = radius * sinf(theta);
-        glVertex2f(x + dx, y + dy);
-    }
-    glEnd();
+// Function to add a new GameObject
+void addGameObject(GameObject newObject) {
+    gameObjects = (GameObject*)realloc(gameObjects, (gameObjectCount + 1) * sizeof(GameObject));
+    gameObjects[gameObjectCount] = newObject;
+    gameObjectCount++;
 }
 
-// Function to update ball position and handle wall collisions
-void updateBall(Circle* ball, float deltaTime) {
-    ball->velocityY += GRAVITY * deltaTime;
-    ball->x += ball->velocityX * deltaTime;
-    ball->y += ball->velocityY * deltaTime;
-
-    // Bounce off walls (left and right)
-    if (ball->x - ball->radius <= -1.0f) {
-        ball->x = -1.0f + ball->radius;
-        ball->velocityX = -ball->velocityX * BOUNCE_DAMPING;
-    } else if (ball->x + ball->radius >= 1.0f) {
-        ball->x = 1.0f - ball->radius;
-        ball->velocityX = -ball->velocityX * BOUNCE_DAMPING;
-    }
-
-    // Bounce off floor
-    if (ball->y - ball->radius <= -1.0f) {
-        ball->y = -1.0f + ball->radius;
-        ball->velocityY = -ball->velocityY * BOUNCE_DAMPING;
-    }
-
-    // Bounce off ceiling
-    if (ball->y + ball->radius >= 1.0f) {
-        ball->y = 1.0f - ball->radius;
-        ball->velocityY = -ball->velocityY * BOUNCE_DAMPING;
-    }
-
-    // Damping to stop small movements
-    if (fabs(ball->velocityY) < 0.0001f && ball->y - ball->radius <= -1.0f) {
-        ball->velocityY = 0.0f;  // Stop the ball if it's bouncing too slowly
-    }
-    if (fabs(ball->velocityX) < 0.0001f) {
-        ball->velocityX = 0.0f;
+// Function to draw a GameObject
+void drawGameObject(const GameObject* obj) {
+    if (obj->type == SHAPE_CIRCLE) {
+        Circle* circle = &obj->shape.circle;
+        glColor3f(circle->r, circle->g, circle->b);  // Set color before drawing
+        drawCircle(circle->x, circle->y, circle->radius, 100);
+    } else if (obj->type == SHAPE_SQUARE) {
+        Square* square = &obj->shape.square;
+        glColor3f(square->r, square->g, square->b);  // Set color before drawing
+        // drawSquare(square->x, square->y, square->size);
     }
 }
 
-// Function to handle collisions between balls
-void handleCollisions() {
-    for (int i = 0; i < ballCount; i++) {
-        Circle* ballA = &balls[i];
-        for (int j = i + 1; j < ballCount; j++) {
-            Circle* ballB = &balls[j];
 
-            float dx = ballB->x - ballA->x;
-            float dy = ballB->y - ballA->y;
-            float distance = sqrtf(dx * dx + dy * dy);
-            float minDistance = ballA->radius + ballB->radius;
+// Function to update GameObject positions
+void updateGameObject(GameObject* obj, float deltaTime) {
+    if (obj->type == SHAPE_CIRCLE) {
+        updateBall(&obj->shape.circle, deltaTime, GRAVITY);
+    } else if (obj->type == SHAPE_SQUARE) {
+        //TODO
+        // updateSquare(&obj->shape.square, deltaTime);
+    }
+}
 
-            if (distance < minDistance) {
-                // Balls are colliding
+// Function to handle collisions between GameObjects
+void handleGameObjectCollisions() {
+    for (int i = 0; i < gameObjectCount; i++) {
+        if (isDraggingObject && i == selectedObjectIndex) continue;
 
-                // Normal vector
-                float nx = dx / distance;
-                float ny = dy / distance;
+        GameObject* objA = &gameObjects[i];
+        if (objA->type != SHAPE_CIRCLE) continue;
 
-                // Overlap amount
-                float overlap = minDistance - distance;
+        for (int j = i + 1; j < gameObjectCount; j++) {
+            if (isDraggingObject && j == selectedObjectIndex) continue;
 
-                // Separate balls to avoid overlap
-                ballA->x -= nx * overlap / 2.0f;
-                ballA->y -= ny * overlap / 2.0f;
-                ballB->x += nx * overlap / 2.0f;
-                ballB->y += ny * overlap / 2.0f;
+            GameObject* objB = &gameObjects[j];
+            if (objB->type != SHAPE_CIRCLE) continue;
 
-                // Relative velocity
-                float vx = ballB->velocityX - ballA->velocityX;
-                float vy = ballB->velocityY - ballA->velocityY;
+            // Handle collisions between two circles
+            //TODO
+            handleCollisions(&objA->shape.circle, &objB->shape.circle);
+        }
+    }
+}
 
-                // Dot product of relative velocity and normal
-                float dot = vx * nx + vy * ny;
+// Mouse button callback for object creation and dragging
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        double xpos, ypos;
+        int width, height;
 
-                // Apply collision response if balls are moving towards each other
-                if (dot < 0.0f) {
-                    // Coefficient of restitution
-                    float restitution = BOUNCE_DAMPING;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        glfwGetWindowSize(window, &width, &height);
 
-                    // Impulse scalar
-                    float impulse = -(1.0f + restitution) * dot / 2.0f;  // Equal mass assumed
+        float gl_x = (float)((xpos / width) * 2.0f - 1.0f);
+        float gl_y = (float)(1.0f - (ypos / height) * 2.0f);
 
-                    // Apply impulse to velocities
-                    ballA->velocityX -= impulse * nx;
-                    ballA->velocityY -= impulse * ny;
-                    ballB->velocityX += impulse * nx;
-                    ballB->velocityY += impulse * ny;
+        if (action == GLFW_PRESS) {
+            // Check for existing object selection
+            for (int i = 0; i < gameObjectCount; i++) {
+                if (gameObjects[i].type == SHAPE_CIRCLE) {
+                    Circle* circle = &gameObjects[i].shape.circle;
+                    float dx = gl_x - circle->x;
+                    float dy = gl_y - circle->y;
+                    float distance = sqrtf(dx * dx + dy * dy);
+
+                    if (distance <= circle->radius) {
+                        selectedObjectIndex = i;
+                        isDraggingObject = true;
+                        dragging = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!isDraggingObject) {
+                // Start dragging to create a new object
+                dragging = true;
+
+                // Initialize a circle object as the preview
+                previewObject.type = SHAPE_CIRCLE;
+                previewObject.shape.circle = (Circle){gl_x, gl_y, 0.05f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
+
+                dragStartX = gl_x;
+                dragStartY = gl_y;
+                dragStartTime = glfwGetTime();
+            }
+        } else if (action == GLFW_RELEASE) {
+            if (isDraggingObject) {
+                // Stop dragging the selected object
+                isDraggingObject = false;
+                selectedObjectIndex = -1;
+            } else if (dragging) {
+                // Finalize the new object
+                dragging = false;
+
+                double dragEndTime = glfwGetTime();
+                double deltaTime = dragEndTime - dragStartTime;
+
+                if (deltaTime > 0.0) {
+                    float velocityScale = 2.0f;
+                    float deltaX = gl_x - dragStartX;
+                    float deltaY = gl_y - dragStartY;
+
+                    previewObject.shape.circle.vx = deltaX / deltaTime * velocityScale;
+                    previewObject.shape.circle.vy = deltaY / deltaTime * velocityScale;
+
+                    // Add the preview object to the game
+                    addGameObject(previewObject);
                 }
             }
         }
     }
 }
-
-// Callback for resizing the window
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    float aspectRatio = (float)width / (float)height;
-    if (aspectRatio >= 1.0f) {
-        glOrtho(-aspectRatio, aspectRatio, -1.0f, 1.0f, -1.0f, 1.0f);
-    } else {
-        glOrtho(-1.0f, 1.0f, -1.0f / aspectRatio, 1.0f / aspectRatio, -1.0f, 1.0f);
-    }
-    glMatrixMode(GL_MODELVIEW);
-}
-
-// Mouse button callback function
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_LEFT) {
-        if (action == GLFW_PRESS) {
-            double xpos, ypos;
-            int width, height;
-
-            // Get mouse position in screen coordinates
-            glfwGetCursorPos(window, &xpos, &ypos);
-            glfwGetWindowSize(window, &width, &height);
-
-            // Convert screen coordinates to OpenGL coordinates
-            float gl_x = (float)((xpos / width) * 2.0f - 1.0f);
-            float gl_y = (float)(1.0f - (ypos / height) * 2.0f);
-
-            // Start dragging and create a preview ball
-            dragging = true;
-            previewBall = (Circle){gl_x, gl_y, 0.1f, 0.0f, 0.0f};
-
-            dragStartX = gl_x;
-            dragStartY = gl_y;
-            dragStartTime = glfwGetTime();
-        } else if (action == GLFW_RELEASE && dragging) {
-            double xpos, ypos;
-            int width, height;
-
-            // Get mouse position in screen coordinates
-            glfwGetCursorPos(window, &xpos, &ypos);
-            glfwGetWindowSize(window, &width, &height);
-
-            // Convert screen coordinates to OpenGL coordinates
-            float gl_x = (float)((xpos / width) * 2.0f - 1.0f);
-            float gl_y = (float)(1.0f - (ypos / height) * 2.0f);
-
-            double dragEndTime = glfwGetTime();
-            double deltaTime = dragEndTime - dragStartTime;
-
-            if (deltaTime > 0.0) {
-                float velocityScale = 2.0f; // Adjust as needed
-                float deltaX = gl_x - dragStartX;
-                float deltaY = gl_y - dragStartY;
-                float initialVelocityX = deltaX / deltaTime * velocityScale;
-                float initialVelocityY = deltaY / deltaTime * velocityScale;
-
-                // Create the new ball with initial velocities
-                Circle newBall = previewBall;
-                newBall.velocityX = initialVelocityX;
-                newBall.velocityY = initialVelocityY;
-
-                // Add new ball to array
-                balls = (Circle*)realloc(balls, (ballCount + 1) * sizeof(Circle));
-                balls[ballCount] = newBall;
-                ballCount++;
-            }
-
-            dragging = false;
-        }
-    }
-}
-
-// Mouse move callback to update preview ball position while dragging
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (dragging) {
-        int width, height;
-        glfwGetWindowSize(window, &width, &height);
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
 
-        // Convert screen coordinates to OpenGL coordinates
-        float gl_x = (float)((xpos / width) * 2.0f - 1.0f);
-        float gl_y = (float)(1.0f - (ypos / height) * 2.0f);
+    float gl_x = (float)((xpos / width) * 2.0f - 1.0f);
+    float gl_y = (float)(1.0f - (ypos / height) * 2.0f);
 
-        // Update the preview ball position
-        previewBall.x = gl_x;
-        previewBall.y = gl_y;
+    if (isDraggingObject && selectedObjectIndex >= 0 && selectedObjectIndex < gameObjectCount) {
+        if (gameObjects[selectedObjectIndex].type == SHAPE_CIRCLE) {
+            Circle* circle = &gameObjects[selectedObjectIndex].shape.circle;
+            circle->x = gl_x;
+            circle->y = gl_y;
+            circle->vx = 0.0f;
+            circle->vy = 0.0f;
+        }
+    } else if (dragging) {
+        previewObject.shape.circle.x = gl_x;
+        previewObject.shape.circle.y = gl_y;
     }
 }
 
+
+
+
+// Main function
 int main() {
     if (!glfwInit()) {
         return -1;
     }
 
-    // Create a window using GLFW
-    GLFWwindow* window = glfwCreateWindow(800, 600, "2D Basic", NULL, NULL);
+
+    GLFWwindow* window = initializeWindow("GameObject Demo", 800, 600,
+                                          framebuffer_size_callback,
+                                          mouse_button_callback,
+                                          cursor_position_callback);
     if (!window) {
         glfwTerminate();
         return -1;
     }
-    glfwMakeContextCurrent(window);
 
-    // Set the framebuffer resize callback
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    GLFWwindow* window2 = initializeWindow("Drawing Window", 800, 600,
+                                           framebuffer_size_callback, // You can use a different callback if needed
+                                           NULL, NULL); // No mouse or cursor callbacks for window 2
+    if (!window2) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return -1;
+    }
+            // Setup window 1 context
+        glfwMakeContextCurrent(window);
+        int fbWidth, fbHeight;
+        glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+        framebuffer_size_callback(window, fbWidth, fbHeight);
 
-    // Set the mouse button callback
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
+        // Setup window 2 context
+        glfwMakeContextCurrent(window2);
+        initializeDrawing(window2);  // Your drawing module's initialization
 
-    // Set the cursor position callback
-    glfwSetCursorPosCallback(window, cursor_position_callback);
+        // Time variables
+        float lastTime = glfwGetTime();
 
-    // Get initial window size and set viewport and projection matrix
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    framebuffer_size_callback(window, width, height);
+    while (!glfwWindowShouldClose(window) && !glfwWindowShouldClose(window2)) {
+        glfwPollEvents();
 
-    float lastTime = glfwGetTime();
-
-    // Main rendering loop
-    while (!glfwWindowShouldClose(window)) {
+        // Calculate time delta
         float currentTime = glfwGetTime();
         float deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
+        /*** Rendering for Window 1 ***/
+        glfwMakeContextCurrent(window);
+
+        // Clear the color buffer
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Update all balls
-        for (int i = 0; i < ballCount; i++) {
-            updateBall(&balls[i], deltaTime);
+        // Ensure the modelview matrix is reset
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        // Update game objects
+        for (int i = 0; i < gameObjectCount; i++) {
+            if (isDraggingObject && i == selectedObjectIndex) continue;
+
+            updateGameObject(&gameObjects[i], deltaTime);
         }
 
-        // Handle collisions between balls
-        handleCollisions();
+        // Handle collisions
+        handleGameObjectCollisions();
 
-        // Draw all balls
-        for (int i = 0; i < ballCount; i++) {
-            drawCircle(balls[i].x, balls[i].y, balls[i].radius, 100);
+        // Draw game objects
+        for (int i = 0; i < gameObjectCount; i++) {
+            drawGameObject(&gameObjects[i]);
         }
 
-        // If dragging, show the preview ball
         if (dragging) {
-            drawCircle(previewBall.x, previewBall.y, previewBall.radius, 100);
+            drawGameObject(&previewObject);
         }
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
+
+        /*** Rendering for Window 2 ***/
+        glfwMakeContextCurrent(window2);
+
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Render the drawing in window2
+        renderDrawing();
+
+        glfwSwapBuffers(window2);
     }
+    free(gameObjects);
+    gameObjects = NULL;
 
-    free(balls);
-
-    // Clean up
+    glfwDestroyWindow(window);
+    glfwDestroyWindow(window2);
     glfwTerminate();
     return 0;
 }
+
