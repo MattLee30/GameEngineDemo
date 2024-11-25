@@ -1,6 +1,6 @@
 // framebuffer.c
 
-#include "framebuffer.h"
+#include "headders/framebuffer.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int fbWidth, int fbHeight) {
     glfwMakeContextCurrent(window);

@@ -1,14 +1,15 @@
 #include <GLFW/glfw3.h>
-#include "window.h"
-#include "framebuffer.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "structs.h"
-#include "circle.h"
-#include "square.h"
-#include "drawShape.h"
+
+#include "headders/window.h"
+#include "headders/framebuffer.h"
+#include "headders/structs.h"
+#include "headders/circle.h"
+#include "headders/square.h"
+#include "headders/drawShape.h"
 
 
 #define GRAVITY -5.8f  
