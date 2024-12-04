@@ -15,6 +15,7 @@ GLFWwindow* initializeWindow(const char* title, int width, int height,
 
     if (framebufferSizeCallback != NULL) {
         glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+        // Initial call to set up the viewport
         int fbWidth, fbHeight;
         glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
         framebufferSizeCallback(window, fbWidth, fbHeight);
@@ -29,19 +30,4 @@ GLFWwindow* initializeWindow(const char* title, int width, int height,
     }
 
     return window;
-}
-
-void renderWindow(GLFWwindow* window, void (*renderFunction)(void)) {
-    glfwMakeContextCurrent(window);
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    if (renderFunction != NULL) {
-        renderFunction();
-    }
-
-    glfwSwapBuffers(window);
 }

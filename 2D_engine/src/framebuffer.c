@@ -1,5 +1,3 @@
-// framebuffer.c
-
 #include "headders/framebuffer.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int fbWidth, int fbHeight) {

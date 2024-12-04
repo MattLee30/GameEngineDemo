@@ -1,0 +1,27 @@
+// gameobject.h
+
+#ifndef GAMEOBJECT_H
+#define GAMEOBJECT_H
+
+#include <stdbool.h>
+#include "structs.h"
+#include "constants.h"
+
+// Global variables
+extern GameObject* gameObjects;
+extern int gameObjectCount;
+extern bool dragging;
+extern bool isDraggingObject;
+extern int selectedObjectIndex;
+extern GameObject previewObject;
+extern double dragStartX, dragStartY;
+extern double dragStartTime;
+
+// Function declarations
+void addGameObject(GameObject newObject);
+void drawGameObject(const GameObject* obj);
+void updateGameObject(GameObject* obj, float deltaTime);
+void handleGameObjectCollisions();
+void initializeBalls(int numBalls);
+
+#endif // GAMEOBJECT_H
