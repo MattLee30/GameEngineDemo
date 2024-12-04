@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "glfw3.h": "c",
+        "stdbool.h": "c",
+        "structs.h": "c",
+        "stdio.h": "c",
+        "window.h": "c",
+        "framebuffer.h": "c",
+        "circle.h": "c",
+        "square.h": "c",
+        "drawshape.h": "c",
+        "gameobject.h": "c",
+        "input.h": "c",
+        "constants.h": "c"
+    }
+}
