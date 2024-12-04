@@ -2,10 +2,10 @@
 
 #include <GLFW/glfw3.h>
 #include <math.h>
-#include "headders/drawShape.h"
-#include "headders/gameobject.h"
-#include "headders/input.h"
-#include "headders/structs.h"
+#include "headers/drawShape.h"
+#include "headers/gameobject.h"
+#include "headers/input.h"
+#include "headers/structs.h"
 
 
 extern ShapeType selectedShapeType;

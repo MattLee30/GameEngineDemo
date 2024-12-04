@@ -1,6 +1,6 @@
 // window.c
 
-#include "headders/window.h"
+#include "headers/window.h"
 
 GLFWwindow* initializeWindow(const char* title, int width, int height,
                              GLFWframebuffersizefun framebufferSizeCallback,

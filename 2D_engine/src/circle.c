@@ -1,8 +1,8 @@
 // circle.c
 
 #include <math.h>
-#include "headders/circle.h"
-#include "headders/constants.h"
+#include "headers/circle.h"
+#include "headers/constants.h"
 
 
 void updateBall(Circle* circle, float deltaTime, float gravity) {

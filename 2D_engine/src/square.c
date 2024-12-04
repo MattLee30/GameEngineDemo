@@ -1,7 +1,7 @@
 // square.c
 
-#include "headders/square.h"
-#include "headders/constants.h"
+#include "headers/square.h"
+#include "headers/constants.h"
 #include <math.h>
 
 

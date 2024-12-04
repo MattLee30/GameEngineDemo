@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "headders/window.h"
-#include "headders/framebuffer.h"
-#include "headders/structs.h"
-#include "headders/gameobject.h"
-#include "headders/input.h"
-#include "headders/drawShape.h"
-#include "headders/circle.h"
-#include "headders/square.h"
+#include "headers/window.h"
+#include "headers/framebuffer.h"
+#include "headers/structs.h"
+#include "headers/gameobject.h"
+#include "headers/input.h"
+#include "headers/drawShape.h"
+#include "headers/circle.h"
+#include "headers/square.h"
 
 
 int main() {

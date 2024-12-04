@@ -1,20 +1,23 @@
 #include <stdlib.h>
 #include <math.h>
-#include "headders/gameobject.h"
-#include "headders/circle.h"
-#include "headders/square.h"
-#include "headders/drawShape.h"
-#include "headders/constants.h"
+#include "headers/gameobject.h"
+#include "headers/circle.h"
+#include "headers/square.h"
+#include "headers/drawShape.h"
+#include "headers/constants.h"
 
 // Global variables
 GameObject* gameObjects = NULL;
 int gameObjectCount = 0;
-bool dragging = false;
-bool isDraggingObject = false;
+
 int selectedObjectIndex = -1;
 GameObject previewObject;
+
+bool dragging = false;
+bool isDraggingObject = false;
 double dragStartX, dragStartY;
 double dragStartTime;
+
 
 // Function to add a new GameObject
 void addGameObject(GameObject newObject) {

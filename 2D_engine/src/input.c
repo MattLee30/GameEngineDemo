@@ -1,11 +1,11 @@
 // input.c
 
 #include <math.h>
-#include "headders/input.h"
-#include "headders/gameobject.h"
-#include "headders/drawShape.h"
-#include "headders/structs.h"
-#include "headders/constants.h"
+#include "headers/input.h"
+#include "headers/gameobject.h"
+#include "headers/drawShape.h"
+#include "headers/structs.h"
+#include "headers/constants.h"
 
 ShapeType selectedShapeType = SHAPE_CIRCLE; // Default shape
 
