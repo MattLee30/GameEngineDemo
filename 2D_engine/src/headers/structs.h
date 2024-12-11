@@ -1,23 +1,21 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
+typedef struct GameObject GameObject;
+
 typedef enum {
     SHAPE_CIRCLE,
     SHAPE_SQUARE
 } ShapeType;
 
 typedef struct {
-    float x, y;
     float radius;
-    float vx, vy;
-    float r, g, b;
+    GameObject* gameObject;
 } Circle;
 
 typedef struct {
-    float x, y;
     float size;
-    float vx, vy;
-    float r, g, b;
+    GameObject* gameObject;
 } Square;
 
 typedef union {
@@ -25,9 +23,12 @@ typedef union {
     Square square;
 } ShapeUnion;
 
-typedef struct {
+typedef struct GameObject{
     ShapeType type;
     ShapeUnion shape;
+    float x, y;
+    float vx, vy;
+    float r, g , b;
 } GameObject;
 
 #endif

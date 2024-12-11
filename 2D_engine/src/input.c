@@ -11,6 +11,7 @@
 
 ShapeType selectedShapeType = SHAPE_CIRCLE; // Default shape
 int paused = 1; // Pause state
+extern bool dragging;
 
 // Function prototypes
 void handleSelectionBarClick(double xpos, double ypos, int width, int height);
@@ -27,7 +28,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     glfwGetWindowSize(window, &width, &height);
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
-        if (action == GLFW_PRESS) {
+        if (action == GLFW_PRESS && !dragging) {
             if (ypos <= height * 0.1) {
                 // Click in the top bar (Pause button)
                 handlePauseButtonClick(xpos, ypos, width, height);
@@ -38,7 +39,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                 // Click in the game area
                 handleGameAreaClick(window, xpos, ypos, width, height);
             }
-        } else if (action == GLFW_RELEASE) {
+        } else if (action == GLFW_RELEASE && dragging) {
             // Handle mouse release
             handleMouseRelease(window, xpos, ypos, width, height);
         }
@@ -104,27 +105,23 @@ void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width
 
     // Initialize the preview object
     previewObject.type = selectedShapeType;
+    previewObject = (GameObject){
+        .x = gl_x,
+        .y = gl_y,
+        .vx = 0.0f,
+        .vy = 0.0f,
+        .r = 1.0f,
+        .g = 0.0f,
+        .b = 0.0f
+    };
+
     if (selectedShapeType == SHAPE_CIRCLE) {
         previewObject.shape.circle = (Circle){
-            .x = gl_x,
-            .y = gl_y,
             .radius = 0.05f,
-            .vx = 0.0f,
-            .vy = 0.0f,
-            .r = 1.0f,
-            .g = 0.0f,
-            .b = 0.0f
         };
     } else if (selectedShapeType == SHAPE_SQUARE) {
         previewObject.shape.square = (Square){
-            .x = gl_x,
-            .y = gl_y,
             .size = 0.1f,
-            .vx = 0.0f,
-            .vy = 0.0f,
-            .r = 0.0f,
-            .g = 0.0f,
-            .b = 1.0f
         };
     }
 
@@ -156,11 +153,11 @@ void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width,
             float velocityScale = 2.0f;
 
             if (previewObject.type == SHAPE_CIRCLE) {
-                previewObject.shape.circle.vx = deltaX / deltaTime * velocityScale;
-                previewObject.shape.circle.vy = deltaY / deltaTime * velocityScale;
+                previewObject.vx = deltaX / deltaTime * velocityScale;
+                previewObject.vy = deltaY / deltaTime * velocityScale;
             } else if (previewObject.type == SHAPE_SQUARE) {
-                previewObject.shape.square.vx = deltaX / deltaTime * velocityScale;
-                previewObject.shape.square.vy = deltaY / deltaTime * velocityScale;
+                previewObject.vx = deltaX / deltaTime * velocityScale;
+                previewObject.vy = deltaY / deltaTime * velocityScale;
             }
 
             // Add the preview object to the game
@@ -173,9 +170,12 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
     // Implement cursor tracking if needed
     int width, height;
 
+    if(ypos - previewObject.y <= 0 && xpos - previewObject.x <= 0){
+        printf("HELP\n");
+    }
+
     glfwGetCursorPos(window, &xpos, &ypos);
     glfwGetWindowSize(window, &width, &height);
-
 
     //handle hover events
     if (ypos <= height * 0.1) {

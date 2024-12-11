@@ -3,37 +3,44 @@
 #include <math.h>
 #include "headers/circle.h"
 #include "headers/constants.h"
+#include "headers/gameObject.h"
+#include <stdio.h>
 
+extern GameObject* gameObject;
 
 void updateBall(Circle* circle, float deltaTime, float gravity) {
+    if (!circle || !circle->gameObject) {
+        fprintf(stderr, "Error: Circle or its GameObject is NULL.\n");
+        return;
+    }
     // Update position based on velocity and deltaTime
-    circle->x += circle->vx * deltaTime;
-    circle->y += circle->vy * deltaTime;
+    circle->gameObject->x += circle->gameObject->vx * deltaTime;
+    circle->gameObject->y += circle->gameObject->vy * deltaTime;
 
     // Apply gravity
-    circle->vy += gravity * deltaTime;
+    circle->gameObject->vy += gravity * deltaTime;
 
     // Handle collisions with window boundaries
-    if (circle->x - circle->radius < -1.0f) {
-        circle->x = -1.0f + circle->radius;
-        circle->vx = -circle->vx * BOUNCE_DAMPING;
-    } else if (circle->x + circle->radius > 1.0f) {
-        circle->x = 1.0f - circle->radius;
-        circle->vx = -circle->vx * BOUNCE_DAMPING;
+    if (circle->gameObject->x - circle->radius < -1.0f) {
+        circle->gameObject->x = -1.0f + circle->radius;
+        circle->gameObject->vx = -circle->gameObject->vx * BOUNCE_DAMPING;
+    } else if (circle->gameObject->x + circle->radius > 1.0f) {
+        circle->gameObject->x = 1.0f - circle->radius;
+        circle->gameObject->vx = -circle->gameObject->vx * BOUNCE_DAMPING;
     }
 
-    if (circle->y - circle->radius < -1.0f) {
-        circle->y = -1.0f + circle->radius;
-        circle->vy = -circle->vy * BOUNCE_DAMPING;
-    } else if (circle->y + circle->radius > 1.0f) {
-        circle->y = 1.0f - circle->radius;
-        circle->vy = -circle->vy * BOUNCE_DAMPING;
+    if (circle->gameObject->y - circle->radius < -1.0f) {
+        circle->gameObject->y = -1.0f + circle->radius;
+        circle->gameObject->vy = -circle->gameObject->vy * BOUNCE_DAMPING;
+    } else if (circle->gameObject->y + circle->radius > 1.0f) {
+        circle->gameObject->y = 1.0f - circle->radius;
+        circle->gameObject->vy = -circle->gameObject->vy * BOUNCE_DAMPING;
     }
 }
 
 void handleCollisions(Circle* circleA, Circle* circleB) {
-    float dx = circleB->x - circleA->x;
-    float dy = circleB->y - circleA->y;
+    float dx = circleB->gameObject->x - circleA->gameObject->x;
+    float dy = circleB->gameObject->y - circleA->gameObject->y;
     float distance = sqrtf(dx * dx + dy * dy);
     float minDistance = circleA->radius + circleB->radius;
 
@@ -51,14 +58,14 @@ void handleCollisions(Circle* circleA, Circle* circleB) {
         float ny = dy / distance;
 
         // Displace circles out of collision
-        circleA->x -= overlap * nx;
-        circleA->y -= overlap * ny;
-        circleB->x += overlap * nx;
-        circleB->y += overlap * ny;
+        circleA->gameObject->x -= overlap * nx;
+        circleA->gameObject->y -= overlap * ny;
+        circleB->gameObject->x += overlap * nx;
+        circleB->gameObject->y += overlap * ny;
 
         // Relative velocity
-        float rvx = circleB->vx - circleA->vx;
-        float rvy = circleB->vy - circleA->vy;
+        float rvx = circleB->gameObject->vx - circleA->gameObject->vx;
+        float rvy = circleB->gameObject->vy - circleA->gameObject->vy;
 
         // Calculate relative velocity along the normal
         float vn = rvx * nx + rvy * ny;
@@ -78,9 +85,9 @@ void handleCollisions(Circle* circleA, Circle* circleB) {
         float impulseX = impulse * nx;
         float impulseY = impulse * ny;
 
-        circleA->vx -= impulseX;
-        circleA->vy -= impulseY;
-        circleB->vx += impulseX;
-        circleB->vy += impulseY;
+        circleA->gameObject->vx -= impulseX;
+        circleA->gameObject->vy -= impulseY;
+        circleB->gameObject->vx += impulseX;
+        circleB->gameObject->vy += impulseY;
     }
 }
