@@ -2,17 +2,21 @@
 
 #include <math.h>
 #include "headers/input.h"
-#include "headers/gameobject.h"
+#include "headers/gameObject.h"
 #include "headers/drawShape.h"
 #include "headers/structs.h"
 #include "headers/constants.h"
+#include "headers/hoverButton.h"
+#include <stdio.h>
 
 ShapeType selectedShapeType = SHAPE_CIRCLE; // Default shape
+int paused = 1; // Pause state
 
 // Function prototypes
 void handleSelectionBarClick(double xpos, double ypos, int width, int height);
 void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width, int height);
 void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width, int height);
+void handlePauseButtonClick(double xpos, double ypos, int width, int height);
 
 // Mouse button callback for object creation and selection
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -24,7 +28,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
-            if (xpos <= width * 0.2) {
+            if (ypos <= height * 0.1) {
+                // Click in the top bar (Pause button)
+                handlePauseButtonClick(xpos, ypos, width, height);
+            } else if (xpos <= width * 0.2) {
                 // Click in the selection bar
                 handleSelectionBarClick(xpos, ypos, width, height);
             } else {
@@ -37,6 +44,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         }
     }
 }
+
 
 void handleSelectionBarClick(double xpos, double ypos, int width, int height) {
     // Calculate button positions
@@ -58,6 +66,27 @@ void handleSelectionBarClick(double xpos, double ypos, int width, int height) {
     if (ypos >= yPos && ypos <= yPos + buttonHeight) {
         selectedShapeType = SHAPE_SQUARE;
     }
+}
+
+void handlePauseButtonClick(double xpos, double ypos, int width, int height) {
+    int topBarHeight = 100; 
+    int buttonSize = 60; 
+    float padding = 20.0f;
+
+    ypos = height - ypos;
+
+    // if (ypos >= height - topBarHeight && ypos <= height - topBarHeight + buttonSize) {
+    //     printf("HELP1\n");
+
+    //     if (xpos >= width - buttonSize - padding && xpos <= width - padding) {
+    //         printf("HELP2\n");
+
+    //         paused = !paused; 
+    //     }
+    // }
+
+    paused = !paused; 
+
 }
 
 void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width, int height) {
@@ -142,4 +171,22 @@ void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width,
 
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
     // Implement cursor tracking if needed
+    int width, height;
+
+    glfwGetCursorPos(window, &xpos, &ypos);
+    glfwGetWindowSize(window, &width, &height);
+
+
+    //handle hover events
+    if (ypos <= height * 0.1) {
+        // Click in the top bar (Pause button)
+        // handlePauseButtonClick(xpos, ypos, width, height);
+    } else if (xpos <= width * 0.2) {
+        // Click in the selection bar
+        // handleSelectionBarClick(xpos, ypos, width, height);
+    } 
+    // else {
+    //     // Click in the game area
+    //     handleGameAreaClick(window, xpos, ypos, width, height);
+    // }
 }

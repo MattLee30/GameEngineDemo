@@ -5,7 +5,8 @@
 
 #include <GLFW/glfw3.h>
 
-void renderSelectionBar(int fbWidth, int fbHeight);
+void renderSelectionBar(GLFWwindow* window, int fbWidth, int fbHeight);
+void renderTopBar(GLFWwindow* window, int fbWidth, int fbHeight);
 void renderGameArea(int fbWidth, int fbHeight, float deltaTime);
 void drawCircle(float x, float y, float radius, int segments);
 void drawSquare(float x, float y, float size);

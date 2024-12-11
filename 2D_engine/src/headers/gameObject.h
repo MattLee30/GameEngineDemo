@@ -1,4 +1,4 @@
-// gameobject.h
+// gameObject.h
 
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
-#include "headers/gameobject.h"
+#include "headers/gameObject.h"
 #include "headers/circle.h"
 #include "headers/square.h"
 #include "headers/drawShape.h"
@@ -29,14 +29,15 @@ void addGameObject(GameObject newObject) {
 // Function to draw a GameObject
 void drawGameObject(const GameObject* obj) {
     if (obj->type == SHAPE_CIRCLE) {
-        Circle* circle = &obj->shape.circle;
+        const Circle* circle = &obj->shape.circle;
         glColor3f(circle->r, circle->g, circle->b);  // Set color before drawing
         drawCircle(circle->x, circle->y, circle->radius, 100);
-    } else if (obj->type == SHAPE_SQUARE) {
-        Square* square = &obj->shape.square;
-        glColor3f(square->r, square->g, square->b);  // Set color before drawing
-        drawSquare(square->x, square->y, square->size);
-    }
+    } 
+    // else if (obj->type == SHAPE_SQUARE) {
+    //     Square* square = &obj->shape.square;
+    //     glColor3f(square->r, square->g, square->b);  // Set color before drawing
+    //     drawSquare(square->x, square->y, square->size);
+    // }
 }
 
 // Function to update GameObject positions

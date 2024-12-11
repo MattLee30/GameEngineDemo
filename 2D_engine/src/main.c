@@ -5,7 +5,7 @@
 #include "headers/window.h"
 #include "headers/framebuffer.h"
 #include "headers/structs.h"
-#include "headers/gameobject.h"
+#include "headers/gameObject.h"
 #include "headers/input.h"
 #include "headers/drawShape.h"
 #include "headers/circle.h"
@@ -54,10 +54,10 @@ int main() {
         // Get framebuffer size in each loop (in case of window resize)
         glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
-        // Render the selection bar
-        renderSelectionBar(fbWidth, fbHeight);
+        renderSelectionBar(window, fbWidth, fbHeight);
 
-        // Render the game area
+        renderTopBar(window, fbWidth, fbHeight);
+
         renderGameArea(fbWidth, fbHeight, deltaTime);
 
         glfwSwapBuffers(window);
