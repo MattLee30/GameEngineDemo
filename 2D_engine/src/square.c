@@ -32,37 +32,3 @@ void updateSquare(Square* square, float deltaTime) {
         square->vy = -square->vy * BOUNCE_DAMPING;
     }
 }
-
-void handleSquareCollisions(Square* squareA, Square* squareB) {
-    // Implement axis-aligned bounding box (AABB) collision detection
-    float dx = fabsf(squareA->x - squareB->x);
-    float dy = fabsf(squareA->y - squareB->y);
-    float overlapX = (squareA->size / 2 + squareB->size / 2) - dx;
-    float overlapY = (squareA->size / 2 + squareB->size / 2) - dy;
-
-    if (overlapX > 0 && overlapY > 0) {
-        // Collision detected
-        // Resolve collision by moving squares apart
-        if (overlapX < overlapY) {
-            // Resolve along x-axis
-            float sign = (squareA->x < squareB->x) ? -1.0f : 1.0f;
-            squareA->x += sign * overlapX / 2.0f;
-            squareB->x -= sign * overlapX / 2.0f;
-
-            // Exchange velocities along x-axis
-            float tempVx = squareA->vx;
-            squareA->vx = squareB->vx * BOUNCE_DAMPING;
-            squareB->vx = tempVx * BOUNCE_DAMPING;
-        } else {
-            // Resolve along y-axis
-            float sign = (squareA->y < squareB->y) ? -1.0f : 1.0f;
-            squareA->y += sign * overlapY / 2.0f;
-            squareB->y -= sign * overlapY / 2.0f;
-
-            // Exchange velocities along y-axis
-            float tempVy = squareA->vy;
-            squareA->vy = squareB->vy * BOUNCE_DAMPING;
-            squareB->vy = tempVy * BOUNCE_DAMPING;
-        }
-    }
-}

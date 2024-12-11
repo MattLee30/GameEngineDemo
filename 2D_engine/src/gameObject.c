@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
-#include "headers/gameobject.h"
+#include "headers/gameObject.h"
 #include "headers/circle.h"
 #include "headers/square.h"
 #include "headers/drawShape.h"
@@ -61,11 +61,12 @@ void handleGameObjectCollisions() {
             GameObject* objB = &gameObjects[j];
 
             // Handle different collision cases
-            if (objA->type == SHAPE_CIRCLE && objB->type == SHAPE_CIRCLE) {
-                handleCollisions(&objA->shape.circle, &objB->shape.circle);
-            } else if (objA->type == SHAPE_SQUARE && objB->type == SHAPE_SQUARE) {
-                handleSquareCollisions(&objA->shape.square, &objB->shape.square);
-            }
+            // if (objA->type == SHAPE_CIRCLE && objB->type == SHAPE_CIRCLE) {
+            //     handleCollisions(&objA->shape.circle, &objB->shape.circle);
+            // } 
+            // else if (objA->type == SHAPE_SQUARE && objB->type == SHAPE_SQUARE) {
+            //     handleSquareCollisions(&objA->shape.square, &objB->shape.square);
+            // }
             // You can add circle-square collision handling here
         }
     }

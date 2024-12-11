@@ -6,37 +6,84 @@
 #include "headers/drawShape.h"
 #include "headers/structs.h"
 #include "headers/constants.h"
+#include <stdio.h>
+#include "headers/textrenderer.h"
 
 ShapeType selectedShapeType = SHAPE_CIRCLE; // Default shape
+int paused = 1; // Pause state
+extern bool dragging;
+GameObject* draggedObject = NULL;
+GameObject* selectedObject = NULL;
 
 // Function prototypes
 void handleSelectionBarClick(double xpos, double ypos, int width, int height);
 void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width, int height);
 void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width, int height);
+void handlePauseButtonClick(double xpos, double ypos, int width, int height);
+
+// void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+//     double xpos, ypos;
+//     int width, height;
+
+//     glfwGetCursorPos(window, &xpos, &ypos);
+//     glfwGetWindowSize(window, &width, &height);
+
+//     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+//         if (paused) {
+//             // Check if a game object is clicked
+//             selectedObject = getObjectAtCursor(xpos, ypos, width, height);
+//         } else {
+//             handleSelectionBarClick(xpos, ypos, width, height);
+//             draggedObject = getObjectAtCursor(xpos, ypos, width, height);
+//             if (draggedObject) {
+//                 dragging = true;
+//             } else {
+//                 handleGameAreaClick(window, xpos, ypos, width, height);
+//             }
+//         }
+//     } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+//         if (dragging && draggedObject) {
+//             draggedObject = NULL;
+//         } else {
+//             handleMouseRelease(window, xpos, ypos, width, height);
+//         }
+//         dragging = false;
+//     }
 
 // Mouse button callback for object creation and selection
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     double xpos, ypos;
     int width, height;
-
-    glfwGetCursorPos(window, &xpos, &ypos);
     glfwGetWindowSize(window, &width, &height);
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
-            if (xpos <= width * 0.2) {
-                // Click in the selection bar
-                handleSelectionBarClick(xpos, ypos, width, height);
-            } else {
-                // Click in the game area
-                handleGameAreaClick(window, xpos, ypos, width, height);
-            }
+            // if (ypos <= height * 0.1) {
+            //     // Click in the top bar (Pause button)
+            //     handlePauseButtonClick(xpos, ypos, width, height);
+            // } else 
+            // if (xpos <= width * 0.2) {
+            //     // Click in the selection bar
+            //     handleSelectionBarClick(xpos, ypos, width, height);
+            // } else {
+            //     // Click in the game area (not in the pause bar or selection bar)
+            //     draggedObject = getObjectAtCursor(xpos, ypos, width, height);
+            //     if (draggedObject) {
+            //         dragging = true; // Start dragging the existing object
+            //     } else {
+            //         // Create a new object if no existing object is clicked
+            //         handleGameAreaClick(window, xpos, ypos, width, height);
+            //     }
+            // }
+            handleGameAreaClick(window, xpos, ypos, width, height);
+
         } else if (action == GLFW_RELEASE) {
             // Handle mouse release
             handleMouseRelease(window, xpos, ypos, width, height);
         }
     }
 }
+
 
 void handleSelectionBarClick(double xpos, double ypos, int width, int height) {
     // Calculate button positions
@@ -58,6 +105,22 @@ void handleSelectionBarClick(double xpos, double ypos, int width, int height) {
     if (ypos >= yPos && ypos <= yPos + buttonHeight) {
         selectedShapeType = SHAPE_SQUARE;
     }
+
+    // // Render the text box if the game is paused
+    // if (paused && selectedObject) {
+    //     renderTextBox(selectedObject, xpos, ypos);
+    // }
+
+}
+
+void handlePauseButtonClick(double xpos, double ypos, int width, int height) {
+    int topBarHeight = 100; 
+    int buttonSize = 60; 
+    float padding = 20.0f;
+
+    ypos = height - ypos;
+
+    paused = !paused; 
 }
 
 void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width, int height) {

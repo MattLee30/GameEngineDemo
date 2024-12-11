@@ -11,6 +11,8 @@
         "drawshape.h": "c",
         "gameobject.h": "c",
         "input.h": "c",
-        "constants.h": "c"
+        "constants.h": "c",
+        "vector2.h": "c",
+        "textrenderer.h": "c"
     }
 }
