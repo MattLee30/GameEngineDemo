@@ -16,7 +16,7 @@ void drawTriangle(float x, float y, float size);
 
 void renderSelectionBar(GLFWwindow* window, int fbWidth, int fbHeight) {
     // Set viewport for selection bar (left 20% of the window)
-    int topBarHeight = 100;
+    int topBarHeight = 125;
     int sbWidth = fbWidth * 0.2;
     int sbHeight = fbHeight - topBarHeight;
     glViewport(0, 100, sbWidth, sbHeight); 

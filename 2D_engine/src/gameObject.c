@@ -21,6 +21,8 @@ double dragStartTime;
 
 void resolve_collision(GameObject* obj1, GameObject* obj2);
 bool circle_square_collide(Circle* circle, Square* square);
+bool circle_circle_collide(Circle* circle1, Circle* circle2);
+bool square_square_collide(Square* square1, Square* square2);
 
 // Function to add a new GameObject
 void addGameObject(GameObject newObject) {
@@ -88,16 +90,10 @@ void handleGameObjectCollisions() {
 
             GameObject* objB = &gameObjects[j];
 
-            // Handle different collision cases !! NEED TO ABSTRACT
-            if (objA->type == SHAPE_CIRCLE && objB->type == SHAPE_CIRCLE) {
-                handleCollisions(&objA->shape.circle, &objB->shape.circle);
-            } else if (objA->type == SHAPE_SQUARE && objB->type == SHAPE_SQUARE) {
-                handleSquareCollisions(&objA->shape.square, &objB->shape.square);
-            }
-            else if (objA->type == SHAPE_CIRCLE && objB->type == SHAPE_SQUARE) {
-                if (circle_square_collide(&objA->shape.circle, &objB->shape.square)) {
+            if(circle_circle_collide(&objA->shape.circle, &objB->shape.circle) ||
+               square_square_collide(&objA->shape.square, &objB->shape.square) || 
+               circle_square_collide(&objA->shape.circle, &objB->shape.square)) {
                     resolve_collision(objA, objB);
-                }
             }
         }
     }

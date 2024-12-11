@@ -5,6 +5,7 @@
 #include "headers/constants.h"
 #include "headers/gameObject.h"
 #include <stdio.h>
+#include "headers/Vector2.h"
 
 extern GameObject* gameObject;
 
@@ -37,57 +38,26 @@ void updateBall(Circle* circle, float deltaTime) {
         circle->gameObject->vy = -circle->gameObject->vy * BOUNCE_DAMPING;
     }
 }
+// void resolve_circle_collision(GameObject* obj1, GameObject* obj2) {
+//     Vector2 normal = vector_subtract((Vector2){obj2->x, obj2->y}, (Vector2){obj1->x, obj1->y});
+//     normal = vector_normalize(normal);  
 
-void handleCollisions(Circle* circleA, Circle* circleB) {
-    float dx = circleB->gameObject->x - circleA->gameObject->x;
-    float dy = circleB->gameObject->y - circleA->gameObject->y;
-    float distance = sqrtf(dx * dx + dy * dy);
-    float minDistance = circleA->radius + circleB->radius;
+//     Vector2 relative_velocity = vector_subtract((Vector2){obj1->vx, obj1->vy}, 
+//                                                 (Vector2){obj2->vx, obj2->vy});
 
-    if (distance < minDistance) {
-        // Collision detected, resolve it
-        float overlap = 0.5f * (minDistance - distance);
+//     float relative_speed = vector_dot(relative_velocity, normal);
 
-        // Avoid division by zero
-        if (distance == 0.0f) {
-            distance = 0.001f;
-        }
+//     if (relative_speed > 0) {
+//         return;
+//     }
 
-        // Normalize the collision normal vector
-        float nx = dx / distance;
-        float ny = dy / distance;
+//     float impulse = -(1 + 1) * relative_speed / (1 + 1);  // Restitution factor e = 1
 
-        // Displace circles out of collision
-        circleA->gameObject->x -= overlap * nx;
-        circleA->gameObject->y -= overlap * ny;
-        circleB->gameObject->x += overlap * nx;
-        circleB->gameObject->y += overlap * ny;
+//     Vector2 impulse_vector = vector_scale(normal, impulse);
 
-        // Relative velocity
-        float rvx = circleB->gameObject->vx - circleA->gameObject->vx;
-        float rvy = circleB->gameObject->vy - circleA->gameObject->vy;
+//     obj1->vx += impulse_vector.x;
+//     obj1->vy += impulse_vector.y;
 
-        // Calculate relative velocity along the normal
-        float vn = rvx * nx + rvy * ny;
-
-        // If velocities are separating, do nothing
-        if (vn > 0.0f)
-            return;
-
-        // Coefficient of restitution (elasticity)
-        float restitution = BOUNCE_DAMPING;
-
-        // Impulse scalar
-        float impulse = -(1.0f + restitution) * vn;
-        impulse /= 2.0f; // Assuming mass = 1 for both circles
-
-        // Apply impulse to the circles' velocities
-        float impulseX = impulse * nx;
-        float impulseY = impulse * ny;
-
-        circleA->gameObject->vx -= impulseX;
-        circleA->gameObject->vy -= impulseY;
-        circleB->gameObject->vx += impulseX;
-        circleB->gameObject->vy += impulseY;
-    }
-}
+//     obj2->vx -= impulse_vector.x;
+//     obj2->vy -= impulse_vector.y;
+// }

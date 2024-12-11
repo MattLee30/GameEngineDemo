@@ -4,6 +4,7 @@
 #include "headers/constants.h"
 #include <math.h>
 #include <stdio.h>
+#include "headers/Vector2.h"
 
 
 void updateSquare(Square* square, float deltaTime) {
@@ -34,96 +35,26 @@ void updateSquare(Square* square, float deltaTime) {
     }
 }
 
-void handleSquareCollisions(Square* squareA, Square* squareB) {
-    // Implement axis-aligned bounding box (AABB) collision detection
-    float dx = fabsf(squareA->gameObject->x - squareB->gameObject->x);
-    float dy = fabsf(squareA->gameObject->y - squareB->gameObject->y);
-    float overlapX = (squareA->size / 2 + squareB->size / 2) - dx;
-    float overlapY = (squareA->size / 2 + squareB->size / 2) - dy;
+// void resolve_square_collision(GameObject* obj1, GameObject* obj2) {
+//     Vector2 normal = vector_subtract((Vector2){obj2->x, obj2->y}, (Vector2){obj1->x, obj1->y});
+//     normal = vector_normalize(normal);
 
-    if (overlapX > 0 && overlapY > 0) {
-        // Collision detected
-        // Resolve collision by moving squares apart
-        if (overlapX < overlapY) {
-            // Resolve along x-axis
-            float sign = (squareA->gameObject->x < squareB->gameObject->x) ? -1.0f : 1.0f;
-            squareA->gameObject->x += sign * overlapX / 2.0f;
-            squareB->gameObject->x -= sign * overlapX / 2.0f;
+//     Vector2 relative_velocity = vector_subtract((Vector2){obj1->vx, obj1->vy}, 
+//                                                 (Vector2){obj2->vx, obj2->vy});
 
-            // Exchange velocities along x-axis
-            float tempVx = squareA->gameObject->vx;
-            squareA->gameObject->vx = squareB->gameObject->vx * BOUNCE_DAMPING;
-            squareB->gameObject->vx = tempVx * BOUNCE_DAMPING;
-        } else {
-            // Resolve along y-axis
-            float sign = (squareA->gameObject->y < squareB->gameObject->y) ? -1.0f : 1.0f;
-            squareA->gameObject->y += sign * overlapY / 2.0f;
-            squareB->gameObject->y -= sign * overlapY / 2.0f;
+//     float relative_speed = vector_dot(relative_velocity, normal);
 
-            // Exchange velocities along y-axis
-            float tempVy = squareA->gameObject->vy;
-            squareA->gameObject->vy = squareB->gameObject->vy * BOUNCE_DAMPING;
-            squareB->gameObject->vy = tempVy * BOUNCE_DAMPING;
-        }
-    }
-}
+//     if (relative_speed > 0) {
+//         return;
+//     }
 
-void handleCircleSquareCollision(Circle* circle, Square* square) {
-    float circleX = circle->gameObject->x;
-    float circleY = circle->gameObject->y;
-    float circleRadius = circle->radius;
+//     float impulse = -(1 + 1) * relative_speed / (1 + 1);  // Restitution factor e = 1
 
-    float squareX = square->gameObject->x;
-    float squareY = square->gameObject->y;
-    float squareSize = square->size;
+//     Vector2 impulse_vector = vector_scale(normal, impulse);
 
-    // Find the closest point on the square to the circle center
-    float closestX = fmaxf(squareX - squareSize / 2, fminf(circleX, squareX + squareSize / 2));
-    float closestY = fmaxf(squareY - squareSize / 2, fminf(circleY, squareY + squareSize / 2));
+//     obj1->vx += impulse_vector.x;
+//     obj1->vy += impulse_vector.y;
 
-    // Calculate the distance between the circle's center and the closest point on the square
-    float dx = circleX - closestX;
-    float dy = circleY - closestY;
-    float distance = sqrtf(dx * dx + dy * dy);
-
-    // If the distance between the circle's center and the closest point is less than the radius, collision detected
-    if (distance < circleRadius) {
-        float overlap = circleRadius - distance;
-
-        // Normalize the direction of the collision (from the circle center to the closest point)
-        float nx = dx / distance;
-        float ny = dy / distance;
-
-        // Resolve the overlap by moving the circle away from the square
-        circle->gameObject->x += overlap * nx;
-        circle->gameObject->y += overlap * ny;
-
-        // Now handle the velocity exchange (assuming elastic collision)
-        float rvx = square->gameObject->vx - circle->gameObject->vx;
-        float rvy = square->gameObject->vy - circle->gameObject->vy;
-
-        // Relative velocity along the normal
-        float vn = rvx * nx + rvy * ny;
-
-        // If velocities are separating, do nothing
-        if (vn > 0.0f)
-            return;
-
-        // Coefficient of restitution (elasticity)
-        float restitution = BOUNCE_DAMPING;
-
-        // Impulse scalar
-        float impulse = -(1.0f + restitution) * vn;
-        impulse /= 2.0f; // Assuming mass = 1 for both
-
-        // Apply impulse to both objects' velocities
-        float impulseX = impulse * nx;
-        float impulseY = impulse * ny;
-
-        circle->gameObject->vx -= impulseX;
-        circle->gameObject->vy -= impulseY;
-        square->gameObject->vx += impulseX;
-        square->gameObject->vy += impulseY;
-    }
-}
-
+//     obj2->vx -= impulse_vector.x;
+//     obj2->vy -= impulse_vector.y;
+// }

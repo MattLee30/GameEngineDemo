@@ -6,7 +6,6 @@
 #include "structs.h"
 
 void updateSquare(Square* square, float deltaTime);
-void handleSquareCollisions(Square* squareA, Square* squareB);
-void handleCircleSquareCollision(Circle* circle, Square* square);
+void resolve_square_collision(GameObject* obj1, GameObject* obj2);
 
 #endif // SQUARE_H
