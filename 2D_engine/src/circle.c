@@ -8,7 +8,7 @@
 
 extern GameObject* gameObject;
 
-void updateBall(Circle* circle, float deltaTime, float gravity) {
+void updateBall(Circle* circle, float deltaTime) {
     if (!circle || !circle->gameObject) {
         fprintf(stderr, "Error: Circle or its GameObject is NULL.\n");
         return;
@@ -18,7 +18,7 @@ void updateBall(Circle* circle, float deltaTime, float gravity) {
     circle->gameObject->y += circle->gameObject->vy * deltaTime;
 
     // Apply gravity
-    circle->gameObject->vy += gravity * deltaTime;
+    circle->gameObject->vy += GRAVITY * deltaTime;
 
     // Handle collisions with window boundaries
     if (circle->gameObject->x - circle->radius < -1.0f) {

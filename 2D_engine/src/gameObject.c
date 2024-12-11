@@ -19,6 +19,8 @@ bool isDraggingObject = false;
 double dragStartX, dragStartY;
 double dragStartTime;
 
+void resolve_collision(GameObject* obj1, GameObject* obj2);
+bool circle_square_collide(Circle* circle, Square* square);
 
 // Function to add a new GameObject
 void addGameObject(GameObject newObject) {
@@ -28,7 +30,7 @@ void addGameObject(GameObject newObject) {
         exit(EXIT_FAILURE);
     }
 
-    // For memory allocation safety, reassign the gameObject pointers
+    // For memory allocation safety, reassign the gameObject pointers -- DO NOT REMOVE
     for (int i = 0; i < gameObjectCount; i++) {
         if (gameObjects[i].type == SHAPE_CIRCLE) {
             gameObjects[i].shape.circle.gameObject = &gameObjects[i];
@@ -45,6 +47,7 @@ void addGameObject(GameObject newObject) {
         gameObjects[gameObjectCount].shape.square.gameObject = &gameObjects[gameObjectCount];
     }
     gameObjectCount++;
+    printf("Added new object. Total objects: %d\n", gameObjectCount);
 }
 
 // Function to draw a GameObject
@@ -63,7 +66,7 @@ void drawGameObject(const GameObject* obj) {
 // Function to update GameObject positions
 void updateGameObject(GameObject* obj, float deltaTime) {
     if (obj->type == SHAPE_CIRCLE) {
-        updateBall(&obj->shape.circle, deltaTime, GRAVITY);
+        updateBall(&obj->shape.circle, deltaTime);
     } else if (obj->type == SHAPE_SQUARE) {
         updateSquare(&obj->shape.square, deltaTime);
     }
@@ -74,6 +77,10 @@ void handleGameObjectCollisions() {
     for (int i = 0; i < gameObjectCount; i++) {
         if (isDraggingObject && i == selectedObjectIndex) continue;
 
+        if (selectedObjectIndex < 0 || selectedObjectIndex >= gameObjectCount) {
+            selectedObjectIndex = -1; 
+        }
+
         GameObject* objA = &gameObjects[i];
 
         for (int j = i + 1; j < gameObjectCount; j++) {
@@ -81,11 +88,16 @@ void handleGameObjectCollisions() {
 
             GameObject* objB = &gameObjects[j];
 
-            // Handle different collision cases
+            // Handle different collision cases !! NEED TO ABSTRACT
             if (objA->type == SHAPE_CIRCLE && objB->type == SHAPE_CIRCLE) {
                 handleCollisions(&objA->shape.circle, &objB->shape.circle);
             } else if (objA->type == SHAPE_SQUARE && objB->type == SHAPE_SQUARE) {
                 handleSquareCollisions(&objA->shape.square, &objB->shape.square);
+            }
+            else if (objA->type == SHAPE_CIRCLE && objB->type == SHAPE_SQUARE) {
+                if (circle_square_collide(&objA->shape.circle, &objB->shape.square)) {
+                    resolve_collision(objA, objB);
+                }
             }
         }
     }

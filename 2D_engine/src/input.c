@@ -6,7 +6,6 @@
 #include "headers/drawShape.h"
 #include "headers/structs.h"
 #include "headers/constants.h"
-#include "headers/hoverButton.h"
 #include <stdio.h>
 
 ShapeType selectedShapeType = SHAPE_CIRCLE; // Default shape
