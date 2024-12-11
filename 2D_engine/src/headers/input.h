@@ -10,5 +10,6 @@ extern ShapeType selectedShapeType;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+GameObject* getObjectAtCursor(double xpos, double ypos, int width, int height);
 
 #endif // INPUT_H

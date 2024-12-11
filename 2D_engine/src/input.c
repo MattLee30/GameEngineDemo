@@ -11,6 +11,7 @@
 ShapeType selectedShapeType = SHAPE_CIRCLE; // Default shape
 int paused = 1; // Pause state
 extern bool dragging;
+GameObject* draggedObject = NULL;
 
 // Function prototypes
 void handleSelectionBarClick(double xpos, double ypos, int width, int height);
@@ -18,7 +19,6 @@ void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width
 void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width, int height);
 void handlePauseButtonClick(double xpos, double ypos, int width, int height);
 
-// Mouse button callback for object creation and selection
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     double xpos, ypos;
     int width, height;
@@ -27,7 +27,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     glfwGetWindowSize(window, &width, &height);
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
-        if (action == GLFW_PRESS && !dragging) {
+        if (action == GLFW_PRESS) {
             if (ypos <= height * 0.1) {
                 // Click in the top bar (Pause button)
                 handlePauseButtonClick(xpos, ypos, width, height);
@@ -35,15 +35,28 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                 // Click in the selection bar
                 handleSelectionBarClick(xpos, ypos, width, height);
             } else {
-                // Click in the game area
-                handleGameAreaClick(window, xpos, ypos, width, height);
+                // Check if an object is clicked
+                draggedObject = getObjectAtCursor(xpos, ypos, width, height);
+                if (draggedObject) {
+                    dragging = true; // Start dragging the existing object
+                } else {
+                    // Only create a new object if no existing object is clicked
+                    handleGameAreaClick(window, xpos, ypos, width, height);
+                }
             }
-        } else if (action == GLFW_RELEASE && dragging) {
+        } else if (action == GLFW_RELEASE) {
             // Handle mouse release
-            handleMouseRelease(window, xpos, ypos, width, height);
+            if (dragging && draggedObject) {
+                draggedObject = NULL; // Stop dragging the object
+            } else {
+                handleMouseRelease(window, xpos, ypos, width, height);
+            }
+            dragging = false;
         }
     }
 }
+
+
 
 
 void handleSelectionBarClick(double xpos, double ypos, int width, int height) {
@@ -74,16 +87,6 @@ void handlePauseButtonClick(double xpos, double ypos, int width, int height) {
     float padding = 20.0f;
 
     ypos = height - ypos;
-
-    // if (ypos >= height - topBarHeight && ypos <= height - topBarHeight + buttonSize) {
-    //     printf("HELP1\n");
-
-    //     if (xpos >= width - buttonSize - padding && xpos <= width - padding) {
-    //         printf("HELP2\n");
-
-    //         paused = !paused; 
-    //     }
-    // }
 
     paused = !paused; 
 
@@ -151,14 +154,8 @@ void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width,
             float deltaY = gl_y - dragStartY;
 
             float velocityScale = 2.0f;
-
-            if (previewObject.type == SHAPE_CIRCLE) {
-                previewObject.vx = deltaX / deltaTime * velocityScale;
-                previewObject.vy = deltaY / deltaTime * velocityScale;
-            } else if (previewObject.type == SHAPE_SQUARE) {
-                previewObject.vx = deltaX / deltaTime * velocityScale;
-                previewObject.vy = deltaY / deltaTime * velocityScale;
-            }
+            previewObject.vx = deltaX / deltaTime * velocityScale;
+            previewObject.vy = deltaY / deltaTime * velocityScale;
 
             // Add the preview object to the game
             addGameObject(previewObject);
@@ -166,27 +163,54 @@ void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width,
     }
 }
 
-void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-    // Implement cursor tracking if needed
-    int width, height;
+GameObject* getObjectAtCursor(double xpos, double ypos, int width, int height) {
+    float gaWidth = width * 0.8f;
+    float gaHeight = height;
+    float adjustedX = xpos - width * 0.2f;
 
-    if(ypos - previewObject.y <= 0 && xpos - previewObject.x <= 0){
-        printf("HELP\n");
+    float gl_x = (adjustedX / gaWidth) * 2.0f - 1.0f;
+    float aspectRatio = gaHeight / gaWidth;
+    float gl_y = (1.0f - (ypos / gaHeight) * 2.0f) * aspectRatio;
+
+    for (int i = 0; i < gameObjectCount; i++) {
+        GameObject* obj = &gameObjects[i]; // Assume `gameObjects` is your array of objects
+
+        if (obj->type == SHAPE_CIRCLE) {
+            float dx = gl_x - obj->x;
+            float dy = gl_y - obj->y;
+            float distance = sqrtf(dx * dx + dy * dy);
+            if (distance <= obj->shape.circle.radius) {
+                return obj;
+            }
+        } else if (obj->type == SHAPE_SQUARE) {
+            float halfSize = obj->shape.square.size / 2.0f;
+            if (gl_x >= obj->x - halfSize && gl_x <= obj->x + halfSize &&
+                gl_y >= obj->y - halfSize && gl_y <= obj->y + halfSize) {
+                return obj;
+            }
+        }
     }
 
-    glfwGetCursorPos(window, &xpos, &ypos);
-    glfwGetWindowSize(window, &width, &height);
-
-    //handle hover events
-    if (ypos <= height * 0.1) {
-        // Click in the top bar (Pause button)
-        // handlePauseButtonClick(xpos, ypos, width, height);
-    } else if (xpos <= width * 0.2) {
-        // Click in the selection bar
-        // handleSelectionBarClick(xpos, ypos, width, height);
-    } 
-    // else {
-    //     // Click in the game area
-    //     handleGameAreaClick(window, xpos, ypos, width, height);
-    // }
+    return NULL; // No object found under cursor
 }
+
+
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (dragging && draggedObject) {
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+
+        float gaWidth = width * 0.8f;
+        float gaHeight = height;
+        float adjustedX = xpos - width * 0.2f;
+
+        float gl_x = (adjustedX / gaWidth) * 2.0f - 1.0f;
+        float aspectRatio = gaHeight / gaWidth;
+        float gl_y = (1.0f - (ypos / gaHeight) * 2.0f) * aspectRatio;
+
+        // Update the position of the dragged object
+        draggedObject->x = gl_x;
+        draggedObject->y = gl_y;
+    }
+}
+
