@@ -106,6 +106,7 @@ void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width
     // Initialize the preview object
     previewObject.type = selectedShapeType;
     previewObject = (GameObject){
+        .type = selectedShapeType,
         .x = gl_x,
         .y = gl_y,
         .vx = 0.0f,

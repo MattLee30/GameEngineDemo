@@ -37,7 +37,7 @@ int main() {
     float lastTime = glfwGetTime();
 
     // Initialize game objects
-    initializeBalls(10);
+    // initializeBalls(10);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {

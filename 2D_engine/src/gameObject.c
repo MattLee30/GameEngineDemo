@@ -28,6 +28,7 @@ void addGameObject(GameObject newObject) {
         exit(EXIT_FAILURE);
     }
 
+    // For memory allocation safety, reassign the gameObject pointers
     for (int i = 0; i < gameObjectCount; i++) {
         if (gameObjects[i].type == SHAPE_CIRCLE) {
             gameObjects[i].shape.circle.gameObject = &gameObjects[i];
@@ -43,7 +44,6 @@ void addGameObject(GameObject newObject) {
     } else if (newObject.type == SHAPE_SQUARE) {
         gameObjects[gameObjectCount].shape.square.gameObject = &gameObjects[gameObjectCount];
     }
-
     gameObjectCount++;
 }
 
@@ -54,11 +54,10 @@ void drawGameObject(const GameObject* obj) {
         const Circle* circle = &obj->shape.circle;
         drawCircle(obj->x, obj->y, circle->radius, 100);
     } 
-    // else if (obj->type == SHAPE_SQUARE) {
-    //     Square* square = &obj->shape.square;
-    //     glColor3f(square->r, square->g, square->b);  // Set color before drawing
-    //     drawSquare(square->x, square->y, square->size);
-    // }
+    else if (obj->type == SHAPE_SQUARE) {
+        const Square* square = &obj->shape.square;
+        drawSquare(obj->x, obj->y, square->size);
+    }
 }
 
 // Function to update GameObject positions
@@ -93,26 +92,25 @@ void handleGameObjectCollisions() {
 }
 
 // Function to initialize balls
-void initializeBalls(int numBalls) {
-    for (int i = 0; i < numBalls; i++) {
-        GameObject newObject;
-        newObject = (GameObject){
-            .type = SHAPE_CIRCLE,
-            .x = -0.5f + i * 0.1f,
-            .y = 0.5f,
-            .vx = 0.1f * (i % 2 == 0 ? 1 : -1),
-            .vy = 0.0f,
-            .r = 1.0f,
-            .g = 0.0f,
-            .b = 0.0f
-        };
-        newObject.shape.circle = (Circle){
-            .radius = 0.05f,
-            .gameObject = NULL
-        };
-        addGameObject(newObject);
+// void initializeBalls(int numBalls) {
+//     for (int i = 0; i < numBalls; i++) {
+//         GameObject newObject;
+//         newObject = (GameObject){
+//             .type = SHAPE_CIRCLE,
+//             .x = -0.5f + i * 0.1f,
+//             .y = 0.5f,
+//             .vx = 0.1f * (i % 2 == 0 ? 1 : -1),
+//             .vy = 0.0f,
+//             .r = 1.0f,
+//             .g = 0.0f,
+//             .b = 0.0f
+//         };
+//         newObject.shape.circle = (Circle){
+//             .radius = 0.05f,
+//             .gameObject = NULL
+//         };
+//         addGameObject(newObject);
 
-        gameObjects[gameObjectCount - 1].shape.circle.gameObject = &gameObjects[gameObjectCount - 1];
-
-    }
-}
+//         gameObjects[gameObjectCount - 1].shape.circle.gameObject = &gameObjects[gameObjectCount - 1];
+//     }
+// }
