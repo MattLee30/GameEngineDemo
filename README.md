@@ -1,6 +1,9 @@
 # Sharkitect GameEngineDemo
 
-An independent study project conducted by Grayson von Goetz und Schwanenfleiss and Matthew Lee, showcasing a physics game engine written and compiled in C that utilizes vector math to calculate collisions which take into account user interaction.
+An independent study project conducted by Grayson von Goetz und Schwanenfliess and Matthew Lee, showcasing a physics game engine written and compiled in C that utilizes vector math to calculate collisions which take into account user interaction.
+
+When running Sharkitect, use the green triangle to toggle play and pause, hit the red button in the upper right corner to clear all objects, and use the triangles and squares on the left to select which shape you want to make by clicking in the window.
+
 
 ## Instructions
 
