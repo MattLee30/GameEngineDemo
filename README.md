@@ -1,4 +1,4 @@
-# GameEngineDemo
+# Sharkitect GameEngineDemo
 
 An independent study project conducted by Grayson von Goetz und Schwanenfleiss and Matthew Lee, showcasing a physics game engine written and compiled in C that utilizes vector math to calculate collisions which take into account user interaction.
 
