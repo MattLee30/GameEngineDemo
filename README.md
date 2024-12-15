@@ -36,5 +36,5 @@ To compile and run the project, follow these steps:
    
 3. **Run the compiled application:**
    ```bash
-   ./build/myApps
+   ./build/sharkitect
    ```
