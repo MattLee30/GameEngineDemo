@@ -93,3 +93,10 @@ void handleGameObjectCollisions() {
         }
     }
 }
+
+void clearAllGameObjects() {
+    free(gameObjects); 
+    gameObjects = NULL; 
+    gameObjectCount = 0; 
+    printf("All game objects cleared.\n");
+}

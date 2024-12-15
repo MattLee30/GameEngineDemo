@@ -27,9 +27,13 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
-            if (ypos <= height * 0.1) {
+            if (ypos <= height * 0.1 && xpos <= width * 0.2) {
                 handlePauseButtonClick(xpos, ypos, width, height);
-            } else if (xpos <= width * 0.2) {
+            }
+            else if(ypos <= height * 0.1 && xpos >= width * 0.8){
+                clearAllGameObjects();
+            }
+            else if (xpos <= width * 0.2) {
                 handleSelectionBarClick(xpos, ypos, width, height);
             } else {
                 draggedObject = getObjectAtCursor(xpos, ypos, width, height);
@@ -51,11 +55,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
-
-
-
 void handleSelectionBarClick(double xpos, double ypos, int width, int height) {
-    // Calculate button positions
     float sbWidth = width * 0.2f;
     float padding = 20.0f;
     float buttonHeight = 100.0f;
@@ -64,12 +64,10 @@ void handleSelectionBarClick(double xpos, double ypos, int width, int height) {
     // Adjust yPos because window coordinates start from top-left
     ypos = height - ypos;
 
-    // Check if Circle Button was clicked
     if (ypos >= yPos && ypos <= yPos + buttonHeight) {
         selectedShapeType = SHAPE_CIRCLE;
     }
 
-    // Check if Square Button was clicked
     yPos -= (buttonHeight + padding);
     if (ypos >= yPos && ypos <= yPos + buttonHeight) {
         selectedShapeType = SHAPE_SQUARE;
@@ -88,7 +86,6 @@ void handlePauseButtonClick(double xpos, double ypos, int width, int height) {
 }
 
 void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width, int height) {
-    // Adjust for game area viewport
     float gaWidth = width * 0.8f;
     float gaHeight = height;
     float adjustedX = xpos - width * 0.2f;
@@ -97,10 +94,8 @@ void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width
     float aspectRatio = gaHeight / gaWidth;
     float gl_y = (1.0f - (ypos / gaHeight) * 2.0f) * aspectRatio;
 
-    // Start dragging to create a new object
     dragging = true;
 
-    // Initialize the preview object
     previewObject.type = selectedShapeType;
     previewObject = (GameObject){
         .type = selectedShapeType,
@@ -130,7 +125,6 @@ void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width
 
 void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width, int height) {
     if (dragging) {
-        // Finish creating the new object
         dragging = false;
 
         double dragEndTime = glfwGetTime();
@@ -152,7 +146,6 @@ void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width,
             previewObject.vx = deltaX / deltaTime * velocityScale;
             previewObject.vy = deltaY / deltaTime * velocityScale;
 
-            // Add the preview object to the game
             addGameObject(previewObject);
         }
     }
@@ -168,7 +161,7 @@ GameObject* getObjectAtCursor(double xpos, double ypos, int width, int height) {
     float gl_y = (1.0f - (ypos / gaHeight) * 2.0f) * aspectRatio;
 
     for (int i = 0; i < gameObjectCount; i++) {
-        GameObject* obj = &gameObjects[i]; // Assume `gameObjects` is your array of objects
+        GameObject* obj = &gameObjects[i];
 
         if (obj->type == SHAPE_CIRCLE) {
             float dx = gl_x - obj->x;

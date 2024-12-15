@@ -102,6 +102,20 @@ void renderTopBar(GLFWwindow* window, int fbWidth, int fbHeight) {
 
     glColor3f(0.0f, 1.0f, 0.0f); // Green triangle icon
     drawTriangle(xPos + buttonSize / 2.0f, yPos, buttonSize / 2.0f);
+
+        // Clear All Button
+    float clearButtonWidth = 100.0f;
+    float clearButtonHeight = 40.0f;
+    float clearButtonX = fbWidth - clearButtonWidth - padding;
+    float clearButtonY = (topBarHeight - clearButtonHeight) / 2.0f;
+
+    glColor3f(0.8f, 0.2f, 0.2f); // Red for "Clear All"
+    glBegin(GL_QUADS);
+    glVertex2f(clearButtonX, clearButtonY);
+    glVertex2f(clearButtonX + clearButtonWidth, clearButtonY);
+    glVertex2f(clearButtonX + clearButtonWidth, clearButtonY + clearButtonHeight);
+    glVertex2f(clearButtonX, clearButtonY + clearButtonHeight);
+    glEnd();
 }
 
 

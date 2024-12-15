@@ -21,5 +21,6 @@ void drawGameObject(const GameObject* obj);
 void updateGameObject(GameObject* obj, float deltaTime);
 void handleGameObjectCollisions();
 void initializeBalls(int numBalls);
+void clearAllGameObjects();
 
 #endif // GAMEOBJECT_H
