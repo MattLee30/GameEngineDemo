@@ -7,7 +7,6 @@
 #include "structs.h"
 #include "constants.h"
 
-// Global variables
 extern GameObject* gameObjects;
 extern int gameObjectCount;
 extern bool dragging;
@@ -17,7 +16,6 @@ extern GameObject previewObject;
 extern double dragStartX, dragStartY;
 extern double dragStartTime;
 
-// Function declarations
 void addGameObject(GameObject newObject);
 void drawGameObject(const GameObject* obj);
 void updateGameObject(GameObject* obj, float deltaTime);

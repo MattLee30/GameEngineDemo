@@ -14,11 +14,9 @@ void updateBall(Circle* circle, float deltaTime) {
         fprintf(stderr, "Error: Circle or its GameObject is NULL.\n");
         return;
     }
-    // Update position based on velocity and deltaTime
     circle->gameObject->x += circle->gameObject->vx * deltaTime;
     circle->gameObject->y += circle->gameObject->vy * deltaTime;
 
-    // Apply gravity
     circle->gameObject->vy += GRAVITY * deltaTime;
 
     // Handle collisions with window boundaries

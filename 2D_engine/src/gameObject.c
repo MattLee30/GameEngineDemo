@@ -7,7 +7,6 @@
 #include "headers/constants.h"
 #include <stdio.h>
 
-// Global variables
 GameObject* gameObjects = NULL;
 int gameObjectCount = 0;
 
@@ -24,7 +23,6 @@ bool circle_square_collide(Circle* circle, Square* square);
 bool circle_circle_collide(Circle* circle1, Circle* circle2);
 bool square_square_collide(Square* square1, Square* square2);
 
-// Function to add a new GameObject
 void addGameObject(GameObject newObject) {
     gameObjects = (GameObject*)realloc(gameObjects, (gameObjectCount + 1) * sizeof(GameObject));
     if (!gameObjects) {
@@ -52,7 +50,6 @@ void addGameObject(GameObject newObject) {
     printf("Added new object. Total objects: %d\n", gameObjectCount);
 }
 
-// Function to draw a GameObject
 void drawGameObject(const GameObject* obj) {
     glColor3f(obj->r, obj->g, obj->b);
     if (obj->type == SHAPE_CIRCLE) {
@@ -65,7 +62,6 @@ void drawGameObject(const GameObject* obj) {
     }
 }
 
-// Function to update GameObject positions
 void updateGameObject(GameObject* obj, float deltaTime) {
     if (obj->type == SHAPE_CIRCLE) {
         updateBall(&obj->shape.circle, deltaTime);
@@ -74,7 +70,6 @@ void updateGameObject(GameObject* obj, float deltaTime) {
     }
 }
 
-// Function to handle collisions between GameObjects
 void handleGameObjectCollisions() {
     for (int i = 0; i < gameObjectCount; i++) {
         if (isDraggingObject && i == selectedObjectIndex) continue;
@@ -98,27 +93,3 @@ void handleGameObjectCollisions() {
         }
     }
 }
-
-// Function to initialize balls
-// void initializeBalls(int numBalls) {
-//     for (int i = 0; i < numBalls; i++) {
-//         GameObject newObject;
-//         newObject = (GameObject){
-//             .type = SHAPE_CIRCLE,
-//             .x = -0.5f + i * 0.1f,
-//             .y = 0.5f,
-//             .vx = 0.1f * (i % 2 == 0 ? 1 : -1),
-//             .vy = 0.0f,
-//             .r = 1.0f,
-//             .g = 0.0f,
-//             .b = 0.0f
-//         };
-//         newObject.shape.circle = (Circle){
-//             .radius = 0.05f,
-//             .gameObject = NULL
-//         };
-//         addGameObject(newObject);
-
-//         gameObjects[gameObjectCount - 1].shape.circle.gameObject = &gameObjects[gameObjectCount - 1];
-//     }
-// }

@@ -15,7 +15,7 @@ GLFWwindow* initializeWindow(const char* title, int width, int height,
 
     if (framebufferSizeCallback != NULL) {
         glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-        // Initial call to set up the viewport
+
         int fbWidth, fbHeight;
         glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
         framebufferSizeCallback(window, fbWidth, fbHeight);

@@ -17,7 +17,6 @@ int main() {
         return -1;
     }
 
-    // Create a single window
     GLFWwindow* window = initializeWindow("GameObject Demo", 800, 600,
                                           framebuffer_size_callback,
                                           mouse_button_callback,
@@ -27,23 +26,17 @@ int main() {
         return -1;
     }
 
-    // Setup window context
     glfwMakeContextCurrent(window);
     int fbWidth, fbHeight;
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
     framebuffer_size_callback(window, fbWidth, fbHeight);
 
-    // Time variables
     float lastTime = glfwGetTime();
-
-    // Initialize game objects
-    // initializeBalls(10);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        // Calculate time delta
         float currentTime = glfwGetTime();
         float deltaTime = currentTime - lastTime;
         lastTime = currentTime;
@@ -51,7 +44,6 @@ int main() {
         // Clear the color buffer
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Get framebuffer size in each loop (in case of window resize)
         glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
         renderSelectionBar(window, fbWidth, fbHeight);

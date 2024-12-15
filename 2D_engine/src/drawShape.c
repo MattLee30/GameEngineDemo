@@ -20,7 +20,6 @@ void renderSelectionBar(GLFWwindow* window, int fbWidth, int fbHeight) {
     int sbWidth = fbWidth * 0.2;
     int sbHeight = fbHeight - topBarHeight;
     glViewport(0, 100, sbWidth, sbHeight); 
-    // Set orthographic projection for selection bar
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, sbWidth, 0, sbHeight, -1, 1);
@@ -40,7 +39,7 @@ void renderSelectionBar(GLFWwindow* window, int fbWidth, int fbHeight) {
     float yPos = sbHeight - buttonHeight - padding - topBarHeight; // Start immediately below the top bar
 
     // Circle Button
-    glColor3f(selectedShapeType == SHAPE_CIRCLE ? 0.7f : 0.5f, 0.5f, 0.5f); // Highlight based on selection
+    glColor3f(selectedShapeType == SHAPE_CIRCLE ? 0.7f : 0.5f, 0.5f, 0.5f);
     glBegin(GL_QUADS);
     glVertex2f(padding, yPos);
     glVertex2f(sbWidth - padding, yPos);
@@ -52,7 +51,7 @@ void renderSelectionBar(GLFWwindow* window, int fbWidth, int fbHeight) {
     drawCircle(sbWidth / 2.0f, yPos + buttonHeight / 2.0f, 30.0f, 30);
 
     // Square Button
-    yPos -= (buttonHeight + padding); // Move to the next button position
+    yPos -= (buttonHeight + padding); 
     glColor3f(selectedShapeType == SHAPE_SQUARE ? 0.7f : 0.5f, 0.5f, 0.5f);
     glBegin(GL_QUADS);
     glVertex2f(padding, yPos);
@@ -67,7 +66,7 @@ void renderSelectionBar(GLFWwindow* window, int fbWidth, int fbHeight) {
 
 void renderTopBar(GLFWwindow* window, int fbWidth, int fbHeight) {
     // Set viewport for top bar (top part of the window)
-    int topBarHeight = 100; // Height of the top bar
+    int topBarHeight = 100;
     glViewport(0, fbHeight - topBarHeight, fbWidth, topBarHeight);
 
     // Set orthographic projection for the top bar
@@ -79,7 +78,7 @@ void renderTopBar(GLFWwindow* window, int fbWidth, int fbHeight) {
     glLoadIdentity();
 
     // Draw background
-    glColor3f(0.7f, 0.7f, 0.7f); // Lighter background for the top bar
+    glColor3f(0.7f, 0.7f, 0.7f);
     glBegin(GL_QUADS);
     glVertex2f(0, 0);
     glVertex2f(fbWidth, 0);
@@ -90,7 +89,6 @@ void renderTopBar(GLFWwindow* window, int fbWidth, int fbHeight) {
     // Draw Pause Button
     float padding = 20.0f;
     float buttonSize = 60.0f;
-    // float xPos = fbWidth - buttonSize - padding;
     float xPos = 50.0f;
     float yPos = topBarHeight / 2.0f;
 
@@ -102,8 +100,7 @@ void renderTopBar(GLFWwindow* window, int fbWidth, int fbHeight) {
     glVertex2f(xPos, yPos + buttonSize / 2.0f);
     glEnd();
 
-    // Draw triangle icon for pause button
-    glColor3f(0.0f, 1.0f, 0.0f); // Green for the triangle
+    glColor3f(0.0f, 1.0f, 0.0f); // Green triangle icon
     drawTriangle(xPos + buttonSize / 2.0f, yPos, buttonSize / 2.0f);
 }
 
@@ -123,7 +120,6 @@ void renderGameArea(int fbWidth, int fbHeight, float deltaTime) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // Update game objects
     if (!paused) {
         for (int i = 0; i < gameObjectCount; i++) {
             if (isDraggingObject && i == selectedObjectIndex) continue;
@@ -132,10 +128,8 @@ void renderGameArea(int fbWidth, int fbHeight, float deltaTime) {
         handleGameObjectCollisions();
     }
 
-    // Handle collisions
     handleGameObjectCollisions();
 
-    // Draw game objects
     for (int i = 0; i < gameObjectCount; i++) {
         drawGameObject(&gameObjects[i]);
     }
@@ -147,7 +141,7 @@ void renderGameArea(int fbWidth, int fbHeight, float deltaTime) {
 
 void drawCircle(float x, float y, float radius, int segments) {
     glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(x, y); // Center of circle
+    glVertex2f(x, y); 
     for (int i = 0; i <= segments; i++) {
         float angle = i * 2.0f * M_PI / segments;
         float dx = radius * cosf(angle);

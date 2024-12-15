@@ -8,12 +8,11 @@
 #include "headers/constants.h"
 #include <stdio.h>
 
-ShapeType selectedShapeType = SHAPE_CIRCLE; // Default shape
-int paused = 1; // Pause state
+ShapeType selectedShapeType = SHAPE_CIRCLE;
+int paused = 1;
 extern bool dragging;
 GameObject* draggedObject = NULL;
 
-// Function prototypes
 void handleSelectionBarClick(double xpos, double ypos, int width, int height);
 void handleGameAreaClick(GLFWwindow* window, double xpos, double ypos, int width, int height);
 void handleMouseRelease(GLFWwindow* window, double xpos, double ypos, int width, int height);
@@ -29,25 +28,21 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
             if (ypos <= height * 0.1) {
-                // Click in the top bar (Pause button)
                 handlePauseButtonClick(xpos, ypos, width, height);
             } else if (xpos <= width * 0.2) {
-                // Click in the selection bar
                 handleSelectionBarClick(xpos, ypos, width, height);
             } else {
-                // Check if an object is clicked
                 draggedObject = getObjectAtCursor(xpos, ypos, width, height);
                 if (draggedObject) {
-                    dragging = true; // Start dragging the existing object
+                    dragging = true;
                 } else {
                     // Only create a new object if no existing object is clicked
                     handleGameAreaClick(window, xpos, ypos, width, height);
                 }
             }
         } else if (action == GLFW_RELEASE) {
-            // Handle mouse release
             if (dragging && draggedObject) {
-                draggedObject = NULL; // Stop dragging the object
+                draggedObject = NULL;
             } else {
                 handleMouseRelease(window, xpos, ypos, width, height);
             }

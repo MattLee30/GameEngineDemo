@@ -9,7 +9,6 @@
 
 extern GameObject* gameObject;
 
-// Check for collision between circle and square
 bool circle_square_collide(Circle* circle, Square* square) {
     float closestX = fmax(square->gameObject->x - square->size / 2, 
                           fmin(circle->gameObject->x, square->gameObject->x + square->size / 2));
@@ -44,24 +43,20 @@ bool square_square_collide(Square* square1, Square* square2) {
     float top2 = square2->gameObject->y - square2->size / 2;
     float bottom2 = square2->gameObject->y + square2->size / 2;
 
-    // Check for overlap in both x and y directions
     return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
 }
 
 void resolve_collision(GameObject* obj1, GameObject* obj2) {
-    // Calculate normal vector between the two objects
     Vector2 normal = vector_subtract((Vector2){obj2->x, obj2->y}, (Vector2){obj1->x, obj1->y});
     float distance = vector_length(normal);
 
     if (distance == 0.0f) {
-        // Avoid division by zero by setting a small displacement
         normal = (Vector2){1.0f, 0.0f};
         distance = 0.001f;
     } else {
-        normal = vector_scale(normal, 1.0f / distance); // Normalize the normal vector
+        normal = vector_scale(normal, 1.0f / distance);
     }
 
-    // Calculate the overlap distance
     float radius1 = obj1->shape.circle.radius;
     float radius2 = obj2->shape.circle.radius;
     float overlap = (radius1 + radius2) - distance;
@@ -75,10 +70,8 @@ void resolve_collision(GameObject* obj1, GameObject* obj2) {
         obj2->y += correction.y * 0.5f;
     }
 
-    // Calculate relative velocity
     Vector2 relative_velocity = vector_subtract((Vector2){obj1->vx, obj1->vy}, (Vector2){obj2->vx, obj2->vy});
 
-    // Project relative velocity onto the collision normal
     float relative_speed = vector_dot(relative_velocity, normal);
 
     // If objects are already separating, no impulse is needed
