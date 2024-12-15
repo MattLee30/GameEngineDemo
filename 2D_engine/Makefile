@@ -1,6 +1,6 @@
-APP_NAME = myApps
+APP_NAME = sharkitect
 BUILD_DIR = ./build
-SRC_DIR = ./src/
+SRC_DIR = ./src/ 
 C_FILES = $(wildcard $(SRC_DIR)*.c)
 
 APP_DEFINES := 
